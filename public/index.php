@@ -277,8 +277,8 @@ try {
         
         $hash = password_hash($input['password'], PASSWORD_BCRYPT);
         $stmt = $db->prepare("
-            INSERT INTO users (first_name, last_name, email, phone, password, role, status, created_at) 
-            VALUES (?, ?, ?, ?, ?, 'user', 'active', NOW())
+            INSERT INTO users (first_name, last_name, email, phone, password, role, is_active, created_at) 
+            VALUES (?, ?, ?, ?, ?, 'user', 1, NOW())
         ");
         $stmt->execute([
             $input['first_name'],
