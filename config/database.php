@@ -12,10 +12,10 @@ class Database {
     private $conn;
 
     public function __construct() {
-        $this->host = $_ENV['DB_HOST'] ?? 'localhost';
-        $this->db_name = $_ENV['DB_NAME'] ?? 'skill_swap_academy';
-        $this->username = $_ENV['DB_USER'] ?? 'root';
-        $this->password = $_ENV['DB_PASS'] ?? '';
+        $this->host = $_ENV['DB_HOST'] ?? $_ENV['MYSQLHOST'] ?? 'mysql.railway.internal';
+        $this->db_name = $_ENV['DB_NAME'] ?? $_ENV['MYSQLDATABASE'] ?? 'railway';
+        $this->username = $_ENV['DB_USER'] ?? $_ENV['MYSQLUSER'] ?? 'root';
+        $this->password = $_ENV['DB_PASS'] ?? $_ENV['MYSQLPASSWORD'] ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
     }
 
     public function connect() {

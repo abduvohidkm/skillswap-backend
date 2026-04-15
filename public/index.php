@@ -51,13 +51,17 @@ function db() {
     static $pdo = null;
     if ($pdo === null) {
         try {
+            $host = $_ENV['DB_HOST'] ?? $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? 'mysql.railway.internal';
+            $port = $_ENV['DB_PORT'] ?? $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT') ?? '3306';
+            $dbname = $_ENV['DB_NAME'] ?? $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? 'railway';
+            $user = $_ENV['DB_USER'] ?? $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? 'root';
+            $pass = $_ENV['DB_PASS'] ?? $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD') ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+            
             $dsn = sprintf(
                 "mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4",
-                env('DB_HOST', 'localhost'),
-                env('DB_PORT', '3306'),
-                env('DB_NAME', 'railway')
+                $host, $port, $dbname
             );
-            $pdo = new PDO($dsn, env('DB_USER', 'root'), env('DB_PASS', ''), [
+            $pdo = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false
@@ -200,6 +204,24 @@ try {
             'success' => true,
             'message' => 'Database connected successfully'
         ]));
+    }
+    
+    if ($path === '/setup-db') {
+        $pdo = db();
+        $sql = file_get_contents(__DIR__ . '/../database/migrations/create_tables.sql');
+        if ($sql) {
+            $pdo->exec($sql);
+            die(json_encode([
+                'success' => true,
+                'message' => 'Database tables migrated successfully'
+            ]));
+        } else {
+            http_response_code(500);
+            die(json_encode([
+                'success' => false,
+                'message' => 'Could not read migration script'
+            ]));
+        }
     }
     
     // ============================================
