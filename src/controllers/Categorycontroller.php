@@ -12,8 +12,12 @@
  * - DELETE /api/admin/categories/:id (admin)
  */
 
-require_once __DIR__ . '/../utils/Database.php';
-require_once __DIR__ . '/../utils/Response.php';
+namespace SkillSwap\Controllers;
+
+use SkillSwap\Utils\Database;
+use SkillSwap\Utils\Response;
+use PDO;
+use Exception;
 
 class CategoryController {
     private $db;
