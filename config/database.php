@@ -13,14 +13,21 @@ class Database {
 
     public function __construct() {
         $host = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? $_ENV['DB_HOST'] ?? 'mysql.railway.internal';
-        if ($host === 'localhost' || $host === '127.0.0.1') {
+        if (empty($host) || $host === 'localhost' || $host === '127.0.0.1') {
             $host = 'mysql.railway.internal';
         }
         $this->host = $host;
-        $this->db_name = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? $_ENV['DB_NAME'] ?? 'railway';
-        $this->username = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? $_ENV['DB_USER'] ?? 'root';
+        
+        $dbname = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? $_ENV['DB_NAME'] ?? 'railway';
+        if (empty($dbname)) $dbname = 'railway';
+        $this->db_name = $dbname;
+        
+        $user = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? $_ENV['DB_USER'] ?? 'root';
+        if (empty($user)) $user = 'root';
+        $this->username = $user;
+        
         $pass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD') ?? $_ENV['DB_PASS'] ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
-        if ($pass === '' || $pass === 'root') {
+        if (empty($pass) || $pass === 'root') {
             $pass = 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
         }
         $this->password = $pass;

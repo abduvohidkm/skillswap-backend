@@ -52,15 +52,20 @@ function db() {
     if ($pdo === null) {
         try {
             $host = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? $_ENV['DB_HOST'] ?? 'mysql.railway.internal';
-            if ($host === 'localhost' || $host === '127.0.0.1') {
+            if (empty($host) || $host === 'localhost' || $host === '127.0.0.1') {
                 $host = 'mysql.railway.internal';
             }
             $port = $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT') ?? $_ENV['DB_PORT'] ?? '3306';
+            if (empty($port)) $port = '3306';
+            
             $dbname = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? $_ENV['DB_NAME'] ?? 'railway';
+            if (empty($dbname)) $dbname = 'railway';
+            
             $user = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? $_ENV['DB_USER'] ?? 'root';
-            // Also override wrong default passwords if they copied from localhost testing
+            if (empty($user)) $user = 'root';
+            
             $pass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD') ?? $_ENV['DB_PASS'] ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
-            if ($pass === '' || $pass === 'root') {
+            if (empty($pass) || $pass === 'root') {
                 $pass = 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
             }
             
