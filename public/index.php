@@ -232,17 +232,33 @@ try {
     
     if ($path === '/schema-fix') {
         $pdo = db();
+        $results = [];
+        
+        // Drop is_active if exists
         try {
-            // Drop old columns if they exist
-            $pdo->exec("ALTER TABLE users DROP COLUMN IF EXISTS is_active");
-            $pdo->exec("ALTER TABLE users DROP COLUMN IF EXISTS is_banned");
-            // Add status column
-            $pdo->exec("ALTER TABLE users ADD COLUMN status ENUM('active', 'banned') DEFAULT 'active' AFTER role");
-            die(json_encode(['success' => true, 'message' => 'Schema status applied successfully']));
+            $pdo->exec("ALTER TABLE users DROP COLUMN is_active");
+            $results[] = "Dropped is_active";
         } catch (Exception $e) {
-            http_response_code(500);
-            die(json_encode(['success' => false, 'message' => 'Schema fix failed: ' . $e->getMessage()]));
+            $results[] = "is_active skip: " . $e->getMessage();
         }
+        
+        // Drop is_banned if exists
+        try {
+            $pdo->exec("ALTER TABLE users DROP COLUMN is_banned");
+            $results[] = "Dropped is_banned";
+        } catch (Exception $e) {
+            $results[] = "is_banned skip: " . $e->getMessage();
+        }
+        
+        // Add status column if not exists
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN status ENUM('active', 'banned') DEFAULT 'active' AFTER role");
+            $results[] = "Added status column";
+        } catch (Exception $e) {
+            $results[] = "status add skip: " . $e->getMessage();
+        }
+        
+        die(json_encode(['success' => true, 'results' => $results]));
     }
     
     // ============================================
