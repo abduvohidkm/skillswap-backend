@@ -223,16 +223,25 @@ try {
         $sql = file_get_contents(__DIR__ . '/../database/migrations/create_tables.sql');
         if ($sql) {
             $pdo->exec($sql);
-            die(json_encode([
-                'success' => true,
-                'message' => 'Database tables migrated successfully'
-            ]));
+            die(json_encode(['success' => true, 'message' => 'Database tables migrated successfully']));
         } else {
             http_response_code(500);
-            die(json_encode([
-                'success' => false,
-                'message' => 'Could not read migration script'
-            ]));
+            die(json_encode(['success' => false, 'message' => 'Could not read migration script']));
+        }
+    }
+    
+    if ($path === '/schema-fix') {
+        $pdo = db();
+        try {
+            // Drop old columns if they exist
+            $pdo->exec("ALTER TABLE users DROP COLUMN IF EXISTS is_active");
+            $pdo->exec("ALTER TABLE users DROP COLUMN IF EXISTS is_banned");
+            // Add status column
+            $pdo->exec("ALTER TABLE users ADD COLUMN status ENUM('active', 'banned') DEFAULT 'active' AFTER role");
+            die(json_encode(['success' => true, 'message' => 'Schema status applied successfully']));
+        } catch (Exception $e) {
+            http_response_code(500);
+            die(json_encode(['success' => false, 'message' => 'Schema fix failed: ' . $e->getMessage()]));
         }
     }
     
@@ -277,8 +286,8 @@ try {
         
         $hash = password_hash($input['password'], PASSWORD_BCRYPT);
         $stmt = $db->prepare("
-            INSERT INTO users (first_name, last_name, email, phone, password, role, is_active, created_at) 
-            VALUES (?, ?, ?, ?, ?, 'user', 1, NOW())
+            INSERT INTO users (first_name, last_name, email, phone, password, role, status, created_at) 
+            VALUES (?, ?, ?, ?, ?, 'user', 'active', NOW())
         ");
         $stmt->execute([
             $input['first_name'],

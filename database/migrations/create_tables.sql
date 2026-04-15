@@ -19,8 +19,7 @@ CREATE TABLE users (
     role ENUM('user', 'instructor', 'admin') DEFAULT 'user',
     avatar VARCHAR(500) DEFAULT NULL,
     balance DECIMAL(10, 2) DEFAULT 0.00,
-    is_active BOOLEAN DEFAULT TRUE,
-    is_banned BOOLEAN DEFAULT FALSE,
+    status ENUM('active', 'banned') DEFAULT 'active',
     theme VARCHAR(20) DEFAULT 'dark',
     last_login_at DATETIME DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -28,7 +27,7 @@ CREATE TABLE users (
     
     INDEX idx_email (email),
     INDEX idx_role (role),
-    INDEX idx_is_active (is_active),
+    INDEX idx_status (status),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB;
 
