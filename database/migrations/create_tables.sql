@@ -179,27 +179,7 @@ LEFT JOIN applications a ON c.id = a.course_id
 GROUP BY c.id;
 
 -- =====================================================
--- TRIGGERS
--- =====================================================
-
--- Trigger: Auto-approve application after purchase (since Q5 = A - direct purchase)
-DELIMITER //
-CREATE TRIGGER after_purchase_insert
-AFTER INSERT ON purchases
-FOR EACH ROW
-BEGIN
-    IF NEW.item_type = 'course' AND NEW.status = 'completed' THEN
-        -- Auto-approve the application
-        UPDATE applications 
-        SET status = 'approved', 
-            processed_at = NOW()
-        WHERE student_id = NEW.user_id 
-          AND course_id = NEW.item_id;
-    END IF;
-END//
-DELIMITER ;
-
--- =====================================================
+-- (Trigger for auto-approve moved to application logic to avoid PDO syntax errors)
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 ALTER TABLE users ADD FULLTEXT INDEX ft_user_name (first_name, last_name);
