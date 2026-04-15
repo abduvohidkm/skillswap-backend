@@ -2321,12 +2321,13 @@ try {
         'method' => $method
     ]));
     
-} catch (PDOException $e) {
-    error_log("Database error: " . $e->getMessage());
+} catch (Throwable $e) {
+    error_log("Unhandled Exception: " . $e->getMessage());
     http_response_code(500);
     die(json_encode([
         'success' => false,
-        'message' => 'Database error occurred'
+        'message' => 'Database error occurred: ' . $e->getMessage(),
+        'trace' => $e->getTraceAsString()
     ]));
 } catch (Exception $e) {
     error_log("Server error: " . $e->getMessage());
