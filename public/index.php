@@ -288,7 +288,10 @@ try {
             $hash
         ]);
         
-        $userId = $db->lastInsertId();
+        // Retrieve the generated UUID id properly since lastInsertId() fails for UUIDs
+        $fetchStmt = $db->prepare("SELECT id FROM users WHERE email = ?");
+        $fetchStmt->execute([$input['email']]);
+        $userId = $fetchStmt->fetchColumn();
         $token = jwt_encode([
             'user_id' => $userId,
             'email' => $input['email'],
