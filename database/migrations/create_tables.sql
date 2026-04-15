@@ -4,12 +4,7 @@
 -- Database: MySQL 8.0+
 -- =====================================================
 
--- Create database
-CREATE DATABASE IF NOT EXISTS skill_swap_academy
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-
-USE skill_swap_academy;
+-- Create database stripped for serverless Railway deployment
 
 -- =====================================================
 -- TABLE: users
