@@ -12,10 +12,18 @@ class Database {
     private $conn;
 
     public function __construct() {
-        $this->host = $_ENV['DB_HOST'] ?? $_ENV['MYSQLHOST'] ?? 'mysql.railway.internal';
-        $this->db_name = $_ENV['DB_NAME'] ?? $_ENV['MYSQLDATABASE'] ?? 'railway';
-        $this->username = $_ENV['DB_USER'] ?? $_ENV['MYSQLUSER'] ?? 'root';
-        $this->password = $_ENV['DB_PASS'] ?? $_ENV['MYSQLPASSWORD'] ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+        $host = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? $_ENV['DB_HOST'] ?? 'mysql.railway.internal';
+        if ($host === 'localhost' || $host === '127.0.0.1') {
+            $host = 'mysql.railway.internal';
+        }
+        $this->host = $host;
+        $this->db_name = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? $_ENV['DB_NAME'] ?? 'railway';
+        $this->username = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? $_ENV['DB_USER'] ?? 'root';
+        $pass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD') ?? $_ENV['DB_PASS'] ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+        if ($pass === '' || $pass === 'root') {
+            $pass = 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+        }
+        $this->password = $pass;
     }
 
     public function connect() {

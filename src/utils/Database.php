@@ -14,11 +14,17 @@ class Database {
     public static function getConnection(): PDO {
         if (self::$connection === null) {
             try {
-                $host = $_ENV['DB_HOST'] ?? $_ENV['MYSQLHOST'] ?? 'mysql.railway.internal';
-                $port = $_ENV['DB_PORT'] ?? $_ENV['MYSQLPORT'] ?? '3306';
-                $dbname = $_ENV['DB_NAME'] ?? $_ENV['MYSQLDATABASE'] ?? 'railway';
-                $user = $_ENV['DB_USER'] ?? $_ENV['MYSQLUSER'] ?? 'root';
-                $pass = $_ENV['DB_PASS'] ?? $_ENV['MYSQLPASSWORD'] ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+                $host = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? $_ENV['DB_HOST'] ?? 'mysql.railway.internal';
+                if ($host === 'localhost' || $host === '127.0.0.1') {
+                    $host = 'mysql.railway.internal';
+                }
+                $port = $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT') ?? $_ENV['DB_PORT'] ?? '3306';
+                $dbname = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? $_ENV['DB_NAME'] ?? 'railway';
+                $user = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? $_ENV['DB_USER'] ?? 'root';
+                $pass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD') ?? $_ENV['DB_PASS'] ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+                if ($pass === '' || $pass === 'root') {
+                    $pass = 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+                }
                 
                 $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
                 

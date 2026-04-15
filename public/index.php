@@ -51,11 +51,18 @@ function db() {
     static $pdo = null;
     if ($pdo === null) {
         try {
-            $host = $_ENV['DB_HOST'] ?? $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? 'mysql.railway.internal';
-            $port = $_ENV['DB_PORT'] ?? $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT') ?? '3306';
-            $dbname = $_ENV['DB_NAME'] ?? $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? 'railway';
-            $user = $_ENV['DB_USER'] ?? $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? 'root';
-            $pass = $_ENV['DB_PASS'] ?? $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD') ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+            $host = $_ENV['MYSQLHOST'] ?? getenv('MYSQLHOST') ?? $_ENV['DB_HOST'] ?? 'mysql.railway.internal';
+            if ($host === 'localhost' || $host === '127.0.0.1') {
+                $host = 'mysql.railway.internal';
+            }
+            $port = $_ENV['MYSQLPORT'] ?? getenv('MYSQLPORT') ?? $_ENV['DB_PORT'] ?? '3306';
+            $dbname = $_ENV['MYSQLDATABASE'] ?? getenv('MYSQLDATABASE') ?? $_ENV['DB_NAME'] ?? 'railway';
+            $user = $_ENV['MYSQLUSER'] ?? getenv('MYSQLUSER') ?? $_ENV['DB_USER'] ?? 'root';
+            // Also override wrong default passwords if they copied from localhost testing
+            $pass = $_ENV['MYSQLPASSWORD'] ?? getenv('MYSQLPASSWORD') ?? $_ENV['DB_PASS'] ?? 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+            if ($pass === '' || $pass === 'root') {
+                $pass = 'QKfxegOUsmciItrOQhFKPNAXXjxfYeOg';
+            }
             
             $dsn = sprintf(
                 "mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4",
