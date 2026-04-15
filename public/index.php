@@ -261,6 +261,36 @@ try {
         die(json_encode(['success' => true, 'results' => $results]));
     }
     
+    if ($path === '/create-admin') {
+        $db = db();
+        $email = 'mebel.uz@gmail.com';
+        $password = 'Admin123!';
+        $hash = password_hash($password, PASSWORD_BCRYPT);
+        
+        try {
+            // Check if exists
+            $check = $db->prepare("SELECT id FROM users WHERE email = ?");
+            $check->execute([$email]);
+            $user = $check->fetch();
+            
+            if ($user) {
+                // Update to admin
+                $stmt = $db->prepare("UPDATE users SET role = 'admin', status = 'active' WHERE id = ?");
+                $stmt->execute([$user['id']]);
+                $msg = "Existing user promoted to admin.";
+            } else {
+                // Create new admin
+                $stmt = $db->prepare("INSERT INTO users (first_name, last_name, email, phone, password, role, status) VALUES ('Admin', 'User', ?, '000', ?, 'admin', 'active')");
+                $stmt->execute([$email, $hash]);
+                $msg = "New admin account created.";
+            }
+            die(json_encode(['success' => true, 'message' => $msg, 'email' => $email, 'password' => $password]));
+        } catch (Exception $e) {
+            http_response_code(500);
+            die(json_encode(['success' => false, 'message' => $e->getMessage()]));
+        }
+    }
+    
     // ============================================
     // AUTHENTICATION
     // ============================================
